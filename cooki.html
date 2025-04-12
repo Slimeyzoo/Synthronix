@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🍪 Cookie Simulator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      background-color: #f7f7f7;
+      color: #333;
+      padding: 50px;
+    }
+    h1 {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+    #cookie-count {
+      font-size: 36px;
+      margin-bottom: 30px;
+    }
+    button {
+      padding: 15px 30px;
+      font-size: 20px;
+      background-color: #FFB300;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #e68900;
+    }
+    .shop {
+      margin-top: 50px;
+    }
+    .upgrade {
+      margin-top: 20px;
+      font-size: 20px;
+    }
+    .upgrade-button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #00C853;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .upgrade-button:hover {
+      background-color: #009624;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🍪 Cookie Simulator</h1>
+  <div id="cookie-count">Cookies: 0</div>
+  <button id="cookie-button">Klicke auf den Keks!</button>
+
+  <div class="shop">
+    <h2>Upgrades</h2>
+    <div class="upgrade">
+      <span id="multiplier-text">Multiplikator: 1x</span>
+      <button class="upgrade-button" id="multiplier-upgrade">Multiplikator - 50 Cookies</button>
+    </div>
+    <div class="upgrade">
+      <span id="autoclicker-text">Auto-Klicker: 1 Klick pro Sekunde</span>
+      <button class="upgrade-button" id="autoclicker-upgrade">Auto-Klicker - 200 Cookies</button>
+    </div>
+  </div>
+
+  <script>
+    let cookieCount = 0;
+    let cookiesPerClick = 1;
+    let autoClickerRate = 1; // Auto Klicker startet mit 1 Klick pro Sekunde
+    let multiplierCost = 50; // Startpreis für den Multiplikator
+    let autoclickerCost = 200; // Startpreis für den Auto-Klicker
+    let multiplier = 1; // Multiplikator beginnt bei 1
+
+    // Aktualisiere die Cookie-Anzeige
+    function updateCookieDisplay() {
+      document.getElementById('cookie-count').innerText = `Cookies: ${cookieCount}`;
+    }
+
+    // Klicke auf den Keks
+    document.getElementById('cookie-button').addEventListener('click', () => {
+      cookieCount += cookiesPerClick * multiplier;
+      updateCookieDisplay();
+    });
+
+    // Keks pro Sekunde sammeln (automatisch)
+    setInterval(() => {
+      cookieCount += autoClickerRate;
+      updateCookieDisplay();
+    }, 1000);
+
+    // Multiplikator Upgrade kaufen
+    document.getElementById('multiplier-upgrade').addEventListener('click', () => {
+      if (cookieCount >= multiplierCost) {
+        cookieCount -= multiplierCost;
+        multiplier++; // Erhöhe den Multiplikator
+        multiplierCost = Math.floor(multiplierCost * 1.5); // Preis des Multiplikators wird teurer
+        document.getElementById('multiplier-text').innerText = `Multiplikator: ${multiplier}x`;
+        updateCookieDisplay();
+        document.getElementById('multiplier-upgrade').innerText = `Multiplikator - ${multiplierCost} Cookies`;
+      }
+    });
+
+    // Auto-Klicker Upgrade kaufen
+    document.getElementById('autoclicker-upgrade').addEventListener('click', () => {
+      if (cookieCount >= autoclickerCost) {
+        cookieCount -= autoclickerCost;
+        autoClickerRate++; // Erhöhe den Auto-Klicker (Klick pro Sekunde)
+        autoclickerCost = Math.floor(autoclickerCost * 1.5); // Preis des Auto-Klickers wird teurer
+        document.getElementById('autoclicker-text').innerText = `Auto-Klicker: ${autoClickerRate} Klick pro Sekunde`;
+        updateCookieDisplay();
+        document.getElementById('autoclicker-upgrade').innerText = `Auto-Klicker - ${autoclickerCost} Cookies`;
+      }
+    });
+
+  </script>
+
+</body>
+</html>
