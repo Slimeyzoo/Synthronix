@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Einkaufsliste</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: #fff;
+      padding: 10px;
+      margin-top: 5px;
+      display: flex;
+      justify-content: space-between;
+      border-radius: 5px;
+    }
+    .remove {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🛒 Einkaufsliste</h1>
+  <input id="itemInput" type="text" placeholder="Neues Produkt...">
+  <button onclick="addItem()">Hinzufügen</button>
+  <ul id="list"></ul>
+
+  <script>
+    const input = document.getElementById('itemInput');
+    const list = document.getElementById('list');
+
+    // Liste laden beim Start
+    window.onload = () => {
+      const savedList = JSON.parse(localStorage.getItem('einkaufsliste')) || [];
+      savedList.forEach(item => renderItem(item));
+    };
+
+    function addItem() {
+      const itemText = input.value.trim();
+      if (itemText === '') return;
+
+      renderItem(itemText);
+      saveItem(itemText);
+      input.value = '';
+    }
+
+    function renderItem(text) {
+      const li = document.createElement('li');
+      li.innerHTML = `${text} <button class="remove" onclick="removeItem(this, '${text}')">Entfernen</button>`;
+      list.appendChild(li);
+    }
+
+    function removeItem(button, itemText) {
+      button.parentElement.remove();
+      const savedList = JSON.parse(localStorage.getItem('einkaufsliste')) || [];
+      const newList = savedList.filter(item => item !== itemText);
+      localStorage.setItem('einkaufsliste', JSON.stringify(newList));
+    }
+
+    function saveItem(text) {
+      const savedList = JSON.parse(localStorage.getItem('einkaufsliste')) || [];
+      savedList.push(text);
+      localStorage.setItem('einkaufsliste', JSON.stringify(savedList));
+    }
+  </script>
+</body>
+</html>
