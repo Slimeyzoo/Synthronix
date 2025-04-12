@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Chatbot Version</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .chat-container {
+      background-color: #fff;
+      width: 350px;
+      height: 450px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-box {
+      padding: 10px;
+      flex-grow: 1;
+      overflow-y: auto;
+      margin-bottom: 10px;
+    }
+    .chat-box p {
+      padding: 5px;
+      border-radius: 5px;
+      margin: 5px 0;
+      max-width: 80%;
+      word-wrap: break-word;
+    }
+    .user-msg {
+      background-color: #d1e7fd;
+      align-self: flex-end;
+    }
+    .bot-msg {
+      background-color: #e1e1e1;
+      align-self: flex-start;
+    }
+    .input-area {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid #ddd;
+    }
+    .input-area input {
+      flex-grow: 1;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .input-area button {
+      padding: 10px 15px;
+      margin-left: 5px;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .input-area button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="chat-container">
+    <div class="chat-box" id="chatBox">
+      <p class="bot-msg">Hallo! Ich bin dein Mini Chatbot. Wie kann ich dir helfen?</p>
+    </div>
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="Schreib etwas..." />
+      <button onclick="sendMessage()">Senden</button>
+    </div>
+  </div>
+
+  <script>
+    // Hier wird der Chatverlauf und die Interaktionen verwaltet.
+    const chatBox = document.getElementById('chatBox');
+    const userInput = document.getElementById('userInput');
+
+    // Funktion, um Nachrichten anzuzeigen
+    function displayMessage(message, sender) {
+      const messageElement = document.createElement('p');
+      messageElement.className = sender === 'user' ? 'user-msg' : 'bot-msg';
+      messageElement.innerText = message;
+      chatBox.appendChild(messageElement);
+      chatBox.scrollTop = chatBox.scrollHeight;  // Automatisch nach unten scrollen
+    }
+
+    // Funktion, um auf Benutzereingaben zu reagieren
+    function sendMessage() {
+      const userMessage = userInput.value.trim();
+      if (userMessage) {
+        displayMessage(userMessage, 'user');
+        generateResponse(userMessage);
+      }
+      userInput.value = '';  // Eingabefeld zurücksetzen
+    }
+
+    // Funktion zur Generierung von Bot-Antworten
+    function generateResponse(userMessage) {
+      let response = '';
+      if (userMessage.toLowerCase().includes('wie gehts')) {
+        response = 'Mir gehts gut, danke! 😊 Wie kann ich dir helfen?';
+      } else if (userMessage.toLowerCase().includes('was kannst du tun')) {
+        response = 'Ich kann dir bei vielen Dingen helfen, wie zum Beispiel Fragen beantworten, Tipps geben oder einfach plaudern!';
+      } else if (userMessage.toLowerCase().includes('hallo') || userMessage.toLowerCase().includes('hi')) {
+        response = 'Hallo! Wie kann ich dir heute helfen?';
+      } else {
+        response = 'Entschuldigung, ich habe das nicht verstanden. Kannst du das anders formulieren?';
+      }
+      displayMessage(response, 'bot');
+    }
+  </script>
+
+</body>
+</html>
