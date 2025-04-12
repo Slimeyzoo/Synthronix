@@ -64,20 +64,22 @@
   <div class="shop">
     <h2>Upgrades</h2>
     <div class="upgrade">
-      <span id="upgrade-1-text">Keksernte: 10 Cookies pro Klick</span>
-      <button class="upgrade-button" id="upgrade-1" disabled>Upgrade - 50 Cookies</button>
+      <span id="multiplier-text">Multiplikator: 1x</span>
+      <button class="upgrade-button" id="multiplier-upgrade">Multiplikator - 50 Cookies</button>
     </div>
     <div class="upgrade">
-      <span id="upgrade-2-text">Keksfabrik: +1 Cookie pro Sekunde</span>
-      <button class="upgrade-button" id="upgrade-2" disabled>Upgrade - 200 Cookies</button>
+      <span id="autoclicker-text">Auto-Klicker: 1 Klick pro Sekunde</span>
+      <button class="upgrade-button" id="autoclicker-upgrade">Auto-Klicker - 200 Cookies</button>
     </div>
   </div>
 
   <script>
     let cookieCount = 0;
     let cookiesPerClick = 1;
-    let cookiesPerSecond = 0;
-    let autoCollect = 0;
+    let autoClickerRate = 1; // Auto Klicker startet mit 1 Klick pro Sekunde
+    let multiplierCost = 50; // Startpreis für den Multiplikator
+    let autoclickerCost = 200; // Startpreis für den Auto-Klicker
+    let multiplier = 1; // Multiplikator beginnt bei 1
 
     // Aktualisiere die Cookie-Anzeige
     function updateCookieDisplay() {
@@ -86,51 +88,40 @@
 
     // Klicke auf den Keks
     document.getElementById('cookie-button').addEventListener('click', () => {
-      cookieCount += cookiesPerClick;
+      cookieCount += cookiesPerClick * multiplier;
       updateCookieDisplay();
-      checkUpgrades();
     });
 
     // Keks pro Sekunde sammeln (automatisch)
     setInterval(() => {
-      cookieCount += cookiesPerSecond;
+      cookieCount += autoClickerRate;
       updateCookieDisplay();
     }, 1000);
 
-    // Überprüfen, ob Upgrades verfügbar sind
-    function checkUpgrades() {
-      if (cookieCount >= 50) {
-        document.getElementById('upgrade-1').disabled = false;
-      }
-      if (cookieCount >= 200) {
-        document.getElementById('upgrade-2').disabled = false;
-      }
-    }
-
-    // Upgrade für Keksernte kaufen
-    document.getElementById('upgrade-1').addEventListener('click', () => {
-      if (cookieCount >= 50) {
-        cookieCount -= 50;
-        cookiesPerClick = 10;
+    // Multiplikator Upgrade kaufen
+    document.getElementById('multiplier-upgrade').addEventListener('click', () => {
+      if (cookieCount >= multiplierCost) {
+        cookieCount -= multiplierCost;
+        multiplier++; // Erhöhe den Multiplikator
+        multiplierCost = Math.floor(multiplierCost * 1.5); // Preis des Multiplikators wird teurer
+        document.getElementById('multiplier-text').innerText = `Multiplikator: ${multiplier}x`;
         updateCookieDisplay();
-        document.getElementById('upgrade-1').disabled = true;
-        document.getElementById('upgrade-1-text').innerText = "Keksernte: 10 Cookies pro Klick";
+        document.getElementById('multiplier-upgrade').innerText = `Multiplikator - ${multiplierCost} Cookies`;
       }
     });
 
-    // Upgrade für Keksfabrik kaufen
-    document.getElementById('upgrade-2').addEventListener('click', () => {
-      if (cookieCount >= 200) {
-        cookieCount -= 200;
-        cookiesPerSecond = 1;
+    // Auto-Klicker Upgrade kaufen
+    document.getElementById('autoclicker-upgrade').addEventListener('click', () => {
+      if (cookieCount >= autoclickerCost) {
+        cookieCount -= autoclickerCost;
+        autoClickerRate++; // Erhöhe den Auto-Klicker (Klick pro Sekunde)
+        autoclickerCost = Math.floor(autoclickerCost * 1.5); // Preis des Auto-Klickers wird teurer
+        document.getElementById('autoclicker-text').innerText = `Auto-Klicker: ${autoClickerRate} Klick pro Sekunde`;
         updateCookieDisplay();
-        document.getElementById('upgrade-2').disabled = true;
-        document.getElementById('upgrade-2-text').innerText = "Keksfabrik: +1 Cookie pro Sekunde";
+        document.getElementById('autoclicker-upgrade').innerText = `Auto-Klicker - ${autoclickerCost} Cookies`;
       }
     });
 
-    // Initiale Überprüfung der Upgrades
-    checkUpgrades();
   </script>
 
 </body>
