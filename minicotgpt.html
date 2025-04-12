@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mini Chatbot Version</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mini Chatbot</title>
   <style>
     body {
       font-family: 'Arial', sans-serif;
-      background-color: #f4f4f4;
+      background-color: #1b1b1b;
+      color: white;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -15,54 +16,54 @@
       margin: 0;
     }
     .chat-container {
-      background-color: #fff;
+      background-color: #2a2a2a;
       width: 350px;
-      height: 450px;
+      height: 500px;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
     .chat-box {
+      flex: 1;
       padding: 10px;
-      flex-grow: 1;
       overflow-y: auto;
-      margin-bottom: 10px;
     }
     .chat-box p {
-      padding: 5px;
+      padding: 8px;
       border-radius: 5px;
       margin: 5px 0;
       max-width: 80%;
       word-wrap: break-word;
     }
     .user-msg {
-      background-color: #d1e7fd;
+      background-color: #4caf50;
       align-self: flex-end;
     }
     .bot-msg {
-      background-color: #e1e1e1;
+      background-color: #555;
       align-self: flex-start;
     }
     .input-area {
       display: flex;
       padding: 10px;
-      border-top: 1px solid #ddd;
+      background-color: #1f1f1f;
     }
     .input-area input {
-      flex-grow: 1;
+      flex: 1;
       padding: 10px;
       border-radius: 5px;
-      border: 1px solid #ccc;
+      border: none;
+      margin-right: 5px;
     }
     .input-area button {
-      padding: 10px 15px;
-      margin-left: 5px;
+      background-color: #4caf50;
       border: none;
-      background-color: #4CAF50;
+      padding: 10px 15px;
       color: white;
-      cursor: pointer;
       border-radius: 5px;
+      cursor: pointer;
     }
     .input-area button:hover {
       background-color: #45a049;
@@ -73,53 +74,77 @@
 
   <div class="chat-container">
     <div class="chat-box" id="chatBox">
-      <p class="bot-msg">Hallo! Ich bin dein Mini Chatbot. Wie kann ich dir helfen?</p>
+      <p class="bot-msg">👋 Hallo! Ich bin dein Chatbot. Stell mir eine Frage!</p>
     </div>
     <div class="input-area">
-      <input type="text" id="userInput" placeholder="Schreib etwas..." />
+      <input type="text" id="userInput" placeholder="Schreib was..." />
       <button onclick="sendMessage()">Senden</button>
     </div>
   </div>
 
   <script>
-    // Hier wird der Chatverlauf und die Interaktionen verwaltet.
+    let antworten = [];
+
+    // JSON-Datei laden
+    fetch('antworten.json')
+      .then(response => response.json())
+      .then(data => {
+        antworten = data;
+      });
+
     const chatBox = document.getElementById('chatBox');
     const userInput = document.getElementById('userInput');
 
-    // Funktion, um Nachrichten anzuzeigen
     function displayMessage(message, sender) {
-      const messageElement = document.createElement('p');
-      messageElement.className = sender === 'user' ? 'user-msg' : 'bot-msg';
-      messageElement.innerText = message;
-      chatBox.appendChild(messageElement);
-      chatBox.scrollTop = chatBox.scrollHeight;  // Automatisch nach unten scrollen
+      const msg = document.createElement('p');
+      msg.className = sender === 'user' ? 'user-msg' : 'bot-msg';
+      msg.innerText = message;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // Funktion, um auf Benutzereingaben zu reagieren
     function sendMessage() {
-      const userMessage = userInput.value.trim();
-      if (userMessage) {
-        displayMessage(userMessage, 'user');
-        generateResponse(userMessage);
-      }
-      userInput.value = '';  // Eingabefeld zurücksetzen
+      const input = userInput.value.trim();
+      if (!input) return;
+      displayMessage(input, 'user');
+      generateResponse(input.toLowerCase());
+      userInput.value = '';
     }
 
-    // Funktion zur Generierung von Bot-Antworten
     function generateResponse(userMessage) {
-      let response = '';
-      if (userMessage.toLowerCase().includes('wie gehts')) {
-        response = 'Mir gehts gut, danke! 😊 Wie kann ich dir helfen?';
-      } else if (userMessage.toLowerCase().includes('was kannst du tun')) {
-        response = 'Ich kann dir bei vielen Dingen helfen, wie zum Beispiel Fragen beantworten, Tipps geben oder einfach plaudern!';
-      } else if (userMessage.toLowerCase().includes('hallo') || userMessage.toLowerCase().includes('hi')) {
-        response = 'Hallo! Wie kann ich dir heute helfen?';
-      } else {
-        response = 'Entschuldigung, ich habe das nicht verstanden. Kannst du das anders formulieren?';
+      for (const eintrag of antworten) {
+        if (eintrag.trigger.some(t => userMessage.includes(t))) {
+          let antwort = '';
+          if (Array.isArray(eintrag.antworten)) {
+            antwort = eintrag.antworten[Math.floor(Math.random() * eintrag.antworten.length)];
+          } else if (typeof eintrag.antwort === 'string' && eintrag.antwort.startsWith("dynamic:")) {
+            antwort = getDynamicAntwort(eintrag.antwort);
+          } else {
+            antwort = eintrag.antwort;
+          }
+          displayMessage(antwort, 'bot');
+          return;
+        }
       }
-      displayMessage(response, 'bot');
+      displayMessage('❓ Das habe ich nicht verstanden. Versuch es anders!', 'bot');
+    }
+
+    function getDynamicAntwort(key) {
+      const now = new Date();
+      switch (key) {
+        case 'dynamic:time':
+          return `🕓 Es ist gerade ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')} Uhr.`;
+        case 'dynamic:date':
+          return `📅 Heute ist ${now.toLocaleDateString('de-DE', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })}.`;
+        default:
+          return '⚠️ Diese Info ist leider nicht verfügbar.';
+      }
     }
   </script>
-
 </body>
 </html>

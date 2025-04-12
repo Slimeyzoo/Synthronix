@@ -1,0 +1,59 @@
+{
+    "wissenschaft": {
+      "texte": [
+        {
+          "text": "Die Relativitätstheorie von Einstein hat unser Verständnis von Raum und Zeit revolutioniert.",
+          "stil": "informativ",
+          "schwierigkeitsgrad": "hoch",
+          "laenge": "lang"
+        },
+        {
+          "text": "Die Quantenmechanik beschreibt das Verhalten von Teilchen auf mikroskopischer Ebene.",
+          "stil": "informativ",
+          "schwierigkeitsgrad": "mittel",
+          "laenge": "mittel"
+        },
+        {
+          "text": "Die allgemeine Relativitätstheorie beschreibt die Gravitation als Verzerrung der Raumzeit.",
+          "stil": "formell",
+          "schwierigkeitsgrad": "hoch",
+          "laenge": "lang"
+        },
+        {
+          "text": "Die klassische Mechanik funktioniert gut bei großen Objekten, aber versagt bei sehr kleinen.",
+          "stil": "informativ",
+          "schwierigkeitsgrad": "niedrig",
+          "laenge": "kurz"
+        }
+      ]
+    },
+    "literatur": {
+      "texte": [
+        {
+          "text": "In Goethes Faust wird die Suche nach dem Sinn des Lebens thematisiert.",
+          "stil": "formell",
+          "schwierigkeitsgrad": "hoch",
+          "laenge": "lang"
+        },
+        {
+          "text": "Shakespeares Werke sind voll von komplexen Charakteren und dramatischen Konflikten.",
+          "stil": "literarisch",
+          "schwierigkeitsgrad": "mittel",
+          "laenge": "mittel"
+        },
+        {
+          "text": "Ein Roman wie Der große Gatsby ist ein Meisterwerk der modernen Literatur.",
+          "stil": "literarisch",
+          "schwierigkeitsgrad": "mittel",
+          "laenge": "lang"
+        },
+        {
+          "text": "Die Erzählweise in Moby Dick ist poetisch und episch.",
+          "stil": "literarisch",
+          "schwierigkeitsgrad": "hoch",
+          "laenge": "lang"
+        }
+      ]
+    }
+  }
+  

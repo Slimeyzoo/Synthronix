@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            text-align: center;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 350px;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        select, button {
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .output {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            word-wrap: break-word;
+            height: auto;
+            min-height: 100px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Light Mode Styles */
+        body {
+            background-color: #f4f4f9;
+            color: #000;
+        }
+
+        .container {
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .output {
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        button {
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #ddd;
+        }
+
+        /* Dark Theme Styles */
+        body.dark-theme {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        .container.dark-theme {
+            background-color: #2c2c2c;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6);
+        }
+
+        .output.dark-theme {
+            background-color: #333;
+            color: #e0e0e0;
+        }
+
+        /* Dark Mode Buttons */
+        button.dark-theme {
+            background-color: #444;
+            color: #fff;
+            border: 1px solid #555;
+        }
+
+        /* Button Styles (Home and Dark Mode) */
+        button#home-button, button#theme-toggle {
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #ddd;
+        }
+
+        /* Dark Mode Button Styles */
+        button.dark-theme#home-button, button.dark-theme#theme-toggle {
+            background-color: #444;
+            color: #fff;
+            border: 1px solid #555;
+        }
+
+        select.dark-theme, button.dark-theme {
+            background-color: #444;
+            color: #fff;
+            border: 1px solid #555;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Text Generator</h1>
+
+    <!-- Kategorie-Auswahl -->
+    <label for="category">Wähle eine Kategorie:</label>
+    <select id="category" onchange="ladeSchreibstile()">
+        <!-- Kategorien werden dynamisch geladen -->
+    </select>
+
+    <!-- Schreibstil-Auswahl -->
+    <label for="stil">Wähle den Schreibstil:</label>
+    <select id="stil">
+        <!-- Schreibstile werden dynamisch geladen -->
+    </select>
+
+    <!-- Schwierigkeitsgrad-Auswahl -->
+    <label for="difficulty">Wähle den Schwierigkeitsgrad:</label>
+    <select id="difficulty">
+        <option value="niedrig">Niedrig</option>
+        <option value="mittel">Mittel</option>
+        <option value="hoch">Hoch</option>
+    </select>
+
+    <!-- Längenauswahl -->
+    <label for="length">Wähle die Textlänge:</label>
+    <select id="length">
+        <option value="kurz">Kurz</option>
+        <option value="mittel">Mittel</option>
+        <option value="lang">Lang</option>
+    </select>
+
+    <!-- Button zum Generieren -->
+    <button onclick="generiereText()">Text generieren</button>
+
+    <!-- Bereich für generierten Text -->
+    <div class="output" id="text-output"></div>
+
+    <!-- Dark Mode Toggle Button -->
+    <button onclick="toggleTheme()" class="light-theme" id="theme-toggle">Dark Mode</button>
+
+    <!-- Home Button (zurück zur index.html) -->
+    <button onclick="window.location.href='index.html'" id="home-button">Zurück zur Startseite</button>
+</div>
+
+<script>
+    let texte = {};
+
+    // JSON-Daten laden
+    fetch('texte.json')
+        .then(response => response.json())
+        .then(data => {
+            texte = data;
+            console.log('Daten erfolgreich geladen:', texte);  // Überprüfe die geladenen Daten
+            ladeKategorien();
+        })
+        .catch(error => {
+            console.error("Fehler beim Laden der JSON-Datei:", error);
+            alert('Es gab einen Fehler beim Laden der Daten.');
+        });
+
+    // Kategorien in das Dropdown-Menü laden
+    function ladeKategorien() {
+        const kategorieDropdown = document.getElementById("category");
+        const kategorien = Object.keys(texte);
+
+        kategorien.forEach(kategorie => {
+            const option = document.createElement("option");
+            option.value = kategorie;
+            option.textContent = kategorie.charAt(0).toUpperCase() + kategorie.slice(1);
+            kategorieDropdown.appendChild(option);
+        });
+
+        // Nach dem Laden der Kategorien automatisch die Schreibstile für die erste Kategorie laden
+        ladeSchreibstile();
+    }
+
+    // Schreibstile für die ausgewählte Kategorie laden
+    function ladeSchreibstile() {
+        const kategorie = document.getElementById("category").value;
+        const stilDropdown = document.getElementById("stil");
+
+        // Dropdown zurücksetzen
+        stilDropdown.innerHTML = '';
+
+        if (kategorie && texte[kategorie]) {
+            // Alle Schreibstile für die ausgewählte Kategorie sammeln
+            const schreibstile = new Set();
+            texte[kategorie].texte.forEach(item => {
+                schreibstile.add(item.stil);
+            });
+
+            // Schreibstile als Optionen in das Dropdown hinzufügen
+            schreibstile.forEach(stil => {
+                const option = document.createElement("option");
+                option.value = stil;
+                option.textContent = stil.charAt(0).toUpperCase() + stil.slice(1);
+                stilDropdown.appendChild(option);
+            });
+        }
+    }
+
+    // Funktion zum Generieren eines Textes basierend auf der ausgewählten Kategorie und anderen Parametern
+    function generiereText() {
+        const kategorie = document.getElementById("category").value;
+        const stil = document.getElementById("stil").value;
+        const difficulty = document.getElementById("difficulty").value;
+        const laenge = document.getElementById("length").value;
+
+        console.log(`Ausgewählte Kategorie: ${kategorie}, Stil: ${stil}, Schwierigkeitsgrad: ${difficulty}, Länge: ${laenge}`);
+
+        // Sicherstellen, dass die Kategorie existiert
+        if (!texte[kategorie]) {
+            console.error(`Die Kategorie ${kategorie} existiert nicht.`);
+            document.getElementById("text-output").innerText = "Die Kategorie existiert nicht.";
+            return;
+        }
+
+        // Sicherstellen, dass Texte für diese Kategorie existieren
+        if (!texte[kategorie].texte) {
+            console.error(`Keine Texte für die Kategorie ${kategorie} gefunden.`);
+            document.getElementById("text-output").innerText = "Keine Texte für diese Kategorie gefunden.";
+            return;
+        }
+
+        // Texte für die ausgewählte Kategorie filtern
+        let passendeTexte = texte[kategorie].texte.filter(item => 
+            item.stil === stil && item.schwiierigkeitsgrad === difficulty && item.laenge === laenge
+        );
+
+        // Sicherstellen, dass passende Texte gefunden wurden
+        if (passendeTexte.length === 0) {
+            document.getElementById("text-output").innerText = "Keine passenden Texte gefunden.";
+            return;
+        }
+
+        let anzahlSätze;
+        if (laenge === "kurz") {
+            anzahlSätze = 2;
+        } else if (laenge === "mittel") {
+            anzahlSätze = 4;
+        } else {
+            anzahlSätze = 6;
+        }
+
+        // Zufällige Sätze aus den passenden Filtern auswählen
+        const zufaelligeSätze = [];
+        for (let i = 0; i < anzahlSätze; i++) {
+            const zufaelligerIndex = Math.floor(Math.random() * passendeTexte.length);
+            zufaelligeSätze.push(passendeTexte[zufaelligerIndex].text);
+        }
+
+        // Text zusammenbauen und anzeigen
+        const text = zufaelligeSätze.join(" ");
+        document.getElementById("text-output").innerText = text;
+    }
+
+    // Funktion zum Umschalten des Themes
+    function toggleTheme() {
+        const body = document.body;
+        const container = document.querySelector('.container');
+        const output = document.querySelector('.output');
+        const buttons = document.querySelectorAll('button');
+
+        body.classList.toggle('dark-theme');
+        container.classList.toggle('dark-theme');
+        output.classList.toggle('dark-theme');
+        buttons.forEach(button => {
+            button.classList.toggle('dark-theme');
+        });
+
+        // Dark Mode Toggle Button Text ändern
+        const themeButton = document.getElementById('theme-toggle');
+        if (body.classList.contains('dark-theme')) {
+            themeButton.textContent = 'Light Mode';
+        } else {
+            themeButton.textContent = 'Dark Mode';
+        }
+    }
+</script>
+
+</body>
+</html>
