@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🍪 Cookie Simulator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      background-color: #f7f7f7;
+      color: #333;
+      padding: 50px;
+    }
+    h1 {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+    #cookie-count {
+      font-size: 36px;
+      margin-bottom: 30px;
+    }
+    button {
+      padding: 15px 30px;
+      font-size: 20px;
+      background-color: #FFB300;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #e68900;
+    }
+    .shop {
+      margin-top: 50px;
+    }
+    .upgrade {
+      margin-top: 20px;
+      font-size: 20px;
+    }
+    .upgrade-button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #00C853;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .upgrade-button:hover {
+      background-color: #009624;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🍪 Cookie Simulator</h1>
+  <div id="cookie-count">Cookies: 0</div>
+  <button id="cookie-button">Klicke auf den Keks!</button>
+
+  <div class="shop">
+    <h2>Upgrades</h2>
+    <div class="upgrade">
+      <span id="upgrade-1-text">Keksernte: 10 Cookies pro Klick</span>
+      <button class="upgrade-button" id="upgrade-1" disabled>Upgrade - 50 Cookies</button>
+    </div>
+    <div class="upgrade">
+      <span id="upgrade-2-text">Keksfabrik: +1 Cookie pro Sekunde</span>
+      <button class="upgrade-button" id="upgrade-2" disabled>Upgrade - 200 Cookies</button>
+    </div>
+  </div>
+
+  <script>
+    let cookieCount = 0;
+    let cookiesPerClick = 1;
+    let cookiesPerSecond = 0;
+    let autoCollect = 0;
+
+    // Aktualisiere die Cookie-Anzeige
+    function updateCookieDisplay() {
+      document.getElementById('cookie-count').innerText = `Cookies: ${cookieCount}`;
+    }
+
+    // Klicke auf den Keks
+    document.getElementById('cookie-button').addEventListener('click', () => {
+      cookieCount += cookiesPerClick;
+      updateCookieDisplay();
+      checkUpgrades();
+    });
+
+    // Keks pro Sekunde sammeln (automatisch)
+    setInterval(() => {
+      cookieCount += cookiesPerSecond;
+      updateCookieDisplay();
+    }, 1000);
+
+    // Überprüfen, ob Upgrades verfügbar sind
+    function checkUpgrades() {
+      if (cookieCount >= 50) {
+        document.getElementById('upgrade-1').disabled = false;
+      }
+      if (cookieCount >= 200) {
+        document.getElementById('upgrade-2').disabled = false;
+      }
+    }
+
+    // Upgrade für Keksernte kaufen
+    document.getElementById('upgrade-1').addEventListener('click', () => {
+      if (cookieCount >= 50) {
+        cookieCount -= 50;
+        cookiesPerClick = 10;
+        updateCookieDisplay();
+        document.getElementById('upgrade-1').disabled = true;
+        document.getElementById('upgrade-1-text').innerText = "Keksernte: 10 Cookies pro Klick";
+      }
+    });
+
+    // Upgrade für Keksfabrik kaufen
+    document.getElementById('upgrade-2').addEventListener('click', () => {
+      if (cookieCount >= 200) {
+        cookieCount -= 200;
+        cookiesPerSecond = 1;
+        updateCookieDisplay();
+        document.getElementById('upgrade-2').disabled = true;
+        document.getElementById('upgrade-2-text').innerText = "Keksfabrik: +1 Cookie pro Sekunde";
+      }
+    });
+
+    // Initiale Überprüfung der Upgrades
+    checkUpgrades();
+  </script>
+
+</body>
+</html>
