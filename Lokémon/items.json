@@ -1,0 +1,17 @@
+{
+    "items": [
+      {
+        "name": "Pokéball",
+        "emoji": "🎲",
+        "quantity": 5,
+        "type": "Pokéball"
+      },
+      {
+        "name": "Heiltrank",
+        "emoji": "🧪",
+        "quantity": 3,
+        "type": "Potion"
+      }
+    ]
+  }
+  

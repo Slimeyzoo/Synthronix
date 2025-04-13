@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Pokémon Kampf</title>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      background: #f0f0f0;
+      text-align: center;
+      padding: 20px;
+    }
+    .battle {
+      background: #fff;
+      border: 2px solid #333;
+      border-radius: 10px;
+      padding: 20px;
+      display: inline-block;
+      margin-top: 20px;
+    }
+    .pokemon {
+      margin: 20px;
+      padding: 10px;
+    }
+    .emoji {
+      font-size: 64px;
+    }
+    .hp-bar {
+      height: 20px;
+      background: red;
+      margin: 5px 0;
+      width: 100%;
+      transition: width 0.3s;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 5px;
+      cursor: pointer;
+    }
+    #inventory, #pokemons, #items {
+      margin-top: 20px;
+    }
+    #inventory select {
+      padding: 10px;
+      font-size: 16px;
+    }
+    .shake { animation: shake 0.3s; }
+    .flash { animation: flash 0.3s ease-in-out; }
+    @keyframes shake {
+      0%, 100% { transform: translate(0px, 0px); }
+      25% { transform: translate(-5px, 0px); }
+      50% { transform: translate(5px, 0px); }
+      75% { transform: translate(-5px, 0px); }
+    }
+    @keyframes flash {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+    .pokemon-item {
+      margin: 10px;
+      cursor: pointer;
+      display: inline-block;
+      padding: 10px;
+      border: 2px solid #333;
+      border-radius: 10px;
+      background: #fff;
+    }
+    .pokemon-item:hover {
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔥 Pokémon Kampf! 🔥</h1>
+  
+  <!-- Pokémon Inventar Auswahl -->
+  <div>
+    <h2>Wähle dein Pokémon:</h2>
+    <div id="pokemons">
+      <ul id="pokemonList"></ul>
+    </div>
+    <button onclick="startGame()">Spiel starten</button>
+  </div>
+
+  <!-- Pokémon und Gegner Kampfzone -->
+  <div class="battle" style="display:none;" id="battleZone">
+    <div class="pokemon" id="player">
+      <h2>🧑 Dein Pokémon: <span id="playerName">???</span> (Lvl <span id="playerLevel">1</span>)</h2>
+      <div class="emoji" id="playerEmoji">❓</div>
+      <div class="hp-bar" id="playerHP"></div>
+      <p id="playerHPText">HP: ???</p>
+      <div id="attackButtons"></div>
+    </div>
+    <div class="pokemon" id="enemy">
+      <h2>👾 Gegner: <span id="enemyName">???</span> (Lvl <span id="enemyLevel">?</span>)</h2>
+      <div class="emoji" id="enemyEmoji">❓</div>
+      <div class="hp-bar" id="enemyHP"></div>
+      <p id="enemyHPText">HP: ???</p>
+    </div>
+    <button onclick="usePotion()">🧪 Heiltrank (1)</button>
+    <p id="log"></p>
+  </div>
+
+  <!-- Items Anzeige -->
+  <div id="items">
+    <h2>Deine Items:</h2>
+    <ul id="itemList"></ul>
+  </div>
+
+  <audio id="music" src="sounds/music.mp3" loop></audio>
+  <audio id="sfx" src="sounds/attack.mp3"></audio>
+  <audio id="victory" src="sounds/victory.mp3"></audio>
+  
+  <script>
+    let player = {};
+    let enemy = {};
+    let potions = 1;
+    let allPlayerOptions = [];
+    let capturedPokemons = [];
+    let items = [];
+    let allItems = [];
+
+    const typeAdvantage = {
+      Feuer: { Pflanze: 1.5, Wasser: 0.5 },
+      Wasser: { Feuer: 1.5, Pflanze: 0.5 },
+      Pflanze: { Wasser: 1.5, Feuer: 0.5 }
+    };
+
+    // Damage calculation function
+    function calcDamage(power, attackerType, defenderType) {
+      const bonus = typeAdvantage[attackerType]?.[defenderType] || 1;
+      return Math.floor(power * bonus);
+    }
+
+    // Update the UI elements
+    function updateUI() {
+      document.getElementById("playerHP").style.width = player.hp + "%";
+      document.getElementById("enemyHP").style.width = enemy.hp + "%";
+      document.getElementById("playerHPText").innerText = `HP: ${player.hp}`;
+      document.getElementById("enemyHPText").innerText = `HP: ${enemy.hp}`;
+      document.getElementById("playerLevel").innerText = player.level;
+    }
+
+    // Handle attack animation
+    function addAnimation(id, className) {
+      const el = document.getElementById(id);
+      el.classList.add(className);
+      setTimeout(() => el.classList.remove(className), 300);
+    }
+
+    // Save player data to localStorage
+    function savePlayerData() {
+      localStorage.setItem("pokemon", JSON.stringify(player));
+    }
+
+    // Attack function
+    function attack(attackIndex) {
+      if (player.hp <= 0 || enemy.hp <= 0) return;
+
+      const playerAttack = player.attacks[attackIndex];
+      const playerDmg = calcDamage(playerAttack.power, playerAttack.type, enemy.type);
+      enemy.hp -= playerDmg;
+      if (enemy.hp < 0) enemy.hp = 0;
+
+      document.getElementById("sfx").play();
+      updateUI();
+      addAnimation("enemyEmoji", "shake");
+
+      let log = `⚡ ${player.name} setzt ${playerAttack.name} ein! (${playerDmg} Schaden)`;
+
+      if (enemy.hp <= 0) {
+        log += "<br>🎉 Du hast gewonnen! Level Up!";
+        document.getElementById("victory").play();
+        player.level += 1;
+        player.hp = 100 + player.level * 10;
+        savePlayerData();
+        updateUI();
+        document.getElementById("attackButtons").innerHTML = "";
+        document.getElementById("log").innerHTML = log;
+
+        // Add item drop after victory
+        const droppedItem = dropItem();
+        items.push(droppedItem);
+        updateItemsUI();
+        return;
+      }
+
+      document.getElementById("log").innerHTML = log;
+
+      setTimeout(() => {
+        const enemyAttack = enemy.attacks[Math.floor(Math.random() * enemy.attacks.length)];
+        const enemyDmg = calcDamage(enemyAttack.power, enemyAttack.type, player.type);
+        player.hp -= enemyDmg;
+        if (player.hp < 0) player.hp = 0;
+
+        updateUI();
+        addAnimation("playerEmoji", "flash");
+
+        let log2 = `<br>😈 ${enemy.name} kontert mit ${enemyAttack.name} (${enemyDmg} Schaden)`;
+        if (player.hp <= 0) log2 += "<br>💀 Du wurdest besiegt!";
+        document.getElementById("log").innerHTML += log2;
+      }, 800);
+    }
+
+    // Use potion
+    function usePotion() {
+      if (potions > 0 && player.hp > 0) {
+        player.hp += 30;
+        if (player.hp > 100 + (player.level * 10)) player.hp = 100 + (player.level * 10);
+        potions--;
+        updateUI();
+        document.getElementById("log").innerText = "🧪 Du hast 30 HP geheilt!";
+      }
+    }
+
+    // Item drop after defeating an enemy
+    function dropItem() {
+      const item = allItems[Math.floor(Math.random() * allItems.length)];
+      document.getElementById("log").innerHTML += `<br>🎁 Du hast ein ${item.name} erhalten!`;
+      return item;
+    }
+
+    // Start the game by selecting Pokémon
+    function startGame() {
+      if (!player) return alert("Wähle ein Pokémon!");
+      
+      fetch("gegner.json")
+        .then(res => res.json())
+        .then(data => {
+          const rnd = Math.floor(Math.random() * data.length);
+          enemy = { ...data[rnd], hp: data[rnd].hp };
+          document.getElementById("battleZone").style.display = "block";
+          document.getElementById("music").play();
+          updateBattleUI();
+        });
+    }
+
+    // Update battle UI
+    function updateBattleUI() {
+      document.getElementById("playerName").innerText = player.name;
+      document.getElementById("playerEmoji").innerText = player.emoji;
+      document.getElementById("enemyName").innerText = enemy.name;
+      document.getElementById("enemyEmoji").innerText = enemy.emoji;
+      document.getElementById("enemyLevel").innerText = enemy.level || "?";
+      updateUI();
+      document.getElementById("log").innerText = "";
+
+      const btnContainer = document.getElementById("attackButtons");
+      btnContainer.innerHTML = "";
+      player.attacks.forEach((atk, i) => {
+        const btn = document.createElement("button");
+        btn.textContent = atk.name;
+        btn.onclick = () => attack(i);
+        btnContainer.appendChild(btn);
+      });
+    }
+
+    // Update Pokémon UI
+    function updatePokemonsUI() {
+      const list = document.getElementById("pokemonList");
+      list.innerHTML = "";
+      capturedPokemons.forEach(pokemon => {
+        const item = document.createElement("li");
+        item.innerText = `${pokemon.name} (Lvl ${pokemon.level})`;
+        item.className = "pokemon-item";
+        item.onclick = () => selectPokemon(pokemon);
+        list.appendChild(item);
+      });
+    }
+
+    // Select a Pokémon from the inventory
+    function selectPokemon(pokemon) {
+      player = { ...pokemon, level: pokemon.level, hp: 100 };
+      savePlayerData();
+      updateBattleUI();
+    }
+
+    // Update Items UI
+    function updateItemsUI() {
+      const list = document.getElementById("itemList");
+      list.innerHTML = "";
+      items.forEach(item => {
+        const itemElement = document.createElement("li");
+        itemElement.innerText = item.name;
+        list.appendChild(itemElement);
+      });
+    }
+
+    // Fetch Pokémon and Items data
+    fetch("spieler.json")
+      .then(res => res.json())
+      .then(data => {
+        allPlayerOptions = data;
+        capturedPokemons = data; // assuming all options are captured pokemons
+        updatePokemonsUI();
+      });
+
+    // Fetch Items data
+    fetch("items.json")
+      .then(res => res.json())
+      .then(data => {
+        allItems = data;
+      });
+
+  </script>
+</body>
+</html>

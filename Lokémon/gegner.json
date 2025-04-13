@@ -1,0 +1,36 @@
+[
+    {
+      "name": "Rattfratz",
+      "hp": 100,
+      "emoji": "🐭",
+      "type": "Normal",
+      "level": 3,
+      "attacks": [
+        { "name": "Biss", "power": 14, "type": "Normal" },
+        { "name": "Tackle", "power": 10, "type": "Normal" }
+      ]
+    },
+    {
+      "name": "Zubat",
+      "hp": 90,
+      "emoji": "🦇",
+      "type": "Flug",
+      "level": 2,
+      "attacks": [
+        { "name": "Flügelschlag", "power": 15, "type": "Flug" },
+        { "name": "Giftbiss", "power": 12, "type": "Gift" }
+      ]
+    },
+    {
+      "name": "Glumanda",
+      "hp": 100,
+      "emoji": "🔥",
+      "type": "Feuer",
+      "level": 5,
+      "attacks": [
+        { "name": "Glut", "power": 20, "type": "Feuer" },
+        { "name": "Kratzer", "power": 10, "type": "Normal" }
+      ]
+    }
+  ]
+  

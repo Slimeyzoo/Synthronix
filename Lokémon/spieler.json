@@ -1,0 +1,33 @@
+[
+    {
+      "name": "Glumanda",
+      "hp": 100,
+      "emoji": "🔥",
+      "type": "Feuer",
+      "attacks": [
+        { "name": "Glut", "power": 20, "type": "Feuer" },
+        { "name": "Kratzer", "power": 10, "type": "Normal" }
+      ]
+    },
+    {
+      "name": "Schiggy",
+      "hp": 120,
+      "emoji": "💧",
+      "type": "Wasser",
+      "attacks": [
+        { "name": "Aquaknarre", "power": 18, "type": "Wasser" },
+        { "name": "Tackle", "power": 12, "type": "Normal" }
+      ]
+    },
+    {
+      "name": "Bisasam",
+      "hp": 110,
+      "emoji": "🌿",
+      "type": "Pflanze",
+      "attacks": [
+        { "name": "Rankenhieb", "power": 19, "type": "Pflanze" },
+        { "name": "Tackle", "power": 12, "type": "Normal" }
+      ]
+    }
+  ]
+  
