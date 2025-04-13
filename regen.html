@@ -1,0 +1,26 @@
+<style>
+    .emoji {
+      position: absolute;
+      font-size: 2rem;
+      animation: fall 3s linear forwards;
+    }
+  
+    @keyframes fall {
+      to {
+        transform: translateY(100vh);
+        opacity: 0;
+      }
+    }
+  </style>
+  
+  <script>
+    setInterval(() => {
+      const emoji = document.createElement("div");
+      emoji.innerText = "💧";
+      emoji.className = "emoji";
+      emoji.style.left = Math.random() * window.innerWidth + "px";
+      document.body.appendChild(emoji);
+      setTimeout(() => emoji.remove(), 3000);
+    }, 300);
+  </script>
+  

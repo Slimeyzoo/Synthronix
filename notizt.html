@@ -1,0 +1,11 @@
+<h3>Notizblock</h3>
+<textarea id="notes" placeholder="Schreib was..." oninput="saveNote()" rows="6" cols="30"></textarea>
+
+<script>
+  const notesField = document.getElementById("notes");
+  notesField.value = localStorage.getItem("mynotes") || "";
+
+  function saveNote() {
+    localStorage.setItem("mynotes", notesField.value);
+  }
+</script>
